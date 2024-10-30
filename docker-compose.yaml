@@ -1,0 +1,45 @@
+version: "3.3"
+
+services:
+    postgres:
+      image: postgres:11.16-alpine3.16
+      container_name: "postgres-container"
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: test
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: Qwerty12
+        POSTGRES_INITDB_ARGS: "--lc-collate=C --lc-ctype=C"
+      ports:
+        - 5432:5432
+      depends_on: []
+      networks: ["local-dev"]
+      restart: "always"
+    
+    backend:
+      build: . 
+      container_name: "backend-service"
+      environment:
+        PORT: 3000
+        POSTGRES_DB_TYPE: postgres 
+        POSTGRES_DB: test
+        POSTGRES_HOST: postgres
+        POSTGRES_PORT: 5432
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: Qwerty12
+      ports:
+        - 3000:3000
+      depends_on: 
+        - postgres
+      networks: ["local-dev"]
+      restart: "always"
+
+
+
+networks:
+    local-dev:
+        external: true
+
+volumes:
+    postgres_data:
